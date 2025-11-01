@@ -4,7 +4,7 @@
       "module": "commonjs",
       "baseUrl": ".",
       "target": "es2022",
-      "resolveJsonModule": false,
+      "resolveJsonModule": true,
       "esModuleInterop": true, //permet l'import de fichier json
       "experimentalDecorators": true, //permet l'utilisation des @decorator
       "declaration": true, //permet t'utiliser le keyword declare, pour rajouter de nouveaux types
