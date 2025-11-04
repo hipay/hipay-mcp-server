@@ -1,44 +1,35 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
-import {RequestHandlerExtra} from '@modelcontextprotocol/sdk/shared/protocol.js';
 import HiPay from '../sdk';
-import {z} from 'zod';
+import {TOOL_DEFINITIONS, registerTool} from './tools';
+import packageJson from '../../package.json';
 
 class HiPayMCPServer extends McpServer {
     private _hipay: HiPay;
 
-    constructor({username, password, environment}: {username: string; password: string; environment: 'stage' | 'production'}) {
+    constructor({
+        username,
+        password,
+        environment,
+        enabledTools = []
+    }: {
+        username: string;
+        password: string;
+        environment: 'stage' | 'production';
+        enabledTools?: string[];
+    }) {
         super({
             name: 'HiPay',
-            version: '0.1.0'
+            version: (packageJson as {version: string}).version
         });
 
         this._hipay = new HiPay(username, password, environment);
 
-        this.tool(
-            'transactions.get',
-            'Get a transaction',
-            z.object({
-                transactionId: z.string().describe('The ID of the transaction to get')
-            }).shape,
-            {
-                destructiveHint: false,
-                idempotentHint: false,
-                openWorldHint: true,
-                readOnlyHint: false,
-                title: 'Get transaction'
-            },
-            async (arg: any, _extra: RequestHandlerExtra<any, any>) => {
-                const result = await this._hipay.getTransaction(arg.transactionId);
-                return {
-                    content: [
-                        {
-                            type: 'text' as const,
-                            text: JSON.stringify(result, null, 2)
-                        }
-                    ]
-                };
-            }
-        );
+        const shouldRegisterAll = enabledTools.includes('all') || enabledTools.length === 0;
+        const toolsToRegister = shouldRegisterAll ? TOOL_DEFINITIONS : TOOL_DEFINITIONS.filter((tool) => enabledTools.includes(tool.name));
+
+        for (const definition of toolsToRegister) {
+            registerTool(this, definition, this._hipay);
+        }
     }
 }
 

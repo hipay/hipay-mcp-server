@@ -1,0 +1,64 @@
+stages:
+  - lint
+  - test
+  - build
+  - review
+
+include:
+  - component: $CI_SERVER_FQDN/apm/poc/ai-review-component/ai-review@0.3.1
+    inputs:
+      docker_image_version: "0.3.1"
+      gitlab_private_token: $AI_REVIEW_GITLAB_TOKEN
+      vertex_ai_sa: $AI_REVIEW_SA
+
+prettier:
+  stage: lint
+  image: node:24
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  before_script:
+    - npm ci
+  script:
+    - npm run prettier-check
+
+lint:
+  stage: lint
+  image: node:24
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  before_script:
+    - npm ci
+  script:
+    - npm run lint
+
+test:
+  stage: test
+  image: node:24
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  before_script:
+    - npm ci
+  script:
+    - npm run test
+
+build:
+  stage: build
+  image: node:24
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  before_script:
+    - npm ci
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour

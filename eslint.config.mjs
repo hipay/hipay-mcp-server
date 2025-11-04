@@ -22,6 +22,44 @@ export default [
     ...tseslint.configs.recommended,
     { ignores: ['dist']},
     {
+        files: ["src/**/*.{js,ts}"],
+        plugins: {
+            "@typescript-eslint": typescriptEslint,
+        },
+        languageOptions: {
+            globals: {...globals.node},
+            parser: tsParser,
+            parserOptions: {
+                ecmaVersion: 2022,
+                sourceType: "module",
+                project: "./tsconfig.json"
+            },
+        },
+        rules: {
+            "@typescript-eslint/no-unused-expressions": "off",
+            "@typescript-eslint/no-explicit-any": "error",
+            "@typescript-eslint/no-unsafe-assignment": "error",
+            "@typescript-eslint/no-unsafe-member-access": "error",
+            "@typescript-eslint/no-unsafe-call": "error",
+            "@typescript-eslint/no-unsafe-return": "error",
+            "@typescript-eslint/no-unsafe-argument": "error",
+            "@typescript-eslint/no-require-imports": "off",
+            "@typescript-eslint/ban-ts-comment": "off",
+            "@typescript-eslint/no-wrapper-object-types": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    "args": "all",
+                    "argsIgnorePattern": "^_",
+                    "caughtErrors": "all",
+                    "caughtErrorsIgnorePattern": "^_",
+                    "destructuredArrayIgnorePattern": "^_",
+                    "varsIgnorePattern": "^_",
+                }
+            ]
+        }
+    },
+    {
         files: ["**/*.{js,ts}"],
         plugins: {
             "@typescript-eslint": typescriptEslint,
@@ -34,7 +72,7 @@ export default [
         },
         rules: {
             "@typescript-eslint/no-unused-expressions": "off",
-            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-explicit-any": "error",
             "@typescript-eslint/no-require-imports": "off",
             "@typescript-eslint/ban-ts-comment": "off",
             "@typescript-eslint/no-wrapper-object-types": "off",

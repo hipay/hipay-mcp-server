@@ -3,6 +3,7 @@
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {green, red, yellow} from 'colors';
 import HiPayMCPServer from './server';
+import {TOOL_DEFINITIONS} from './server/tools';
 
 type Options = {
     tools?: string[];
@@ -12,7 +13,7 @@ type Options = {
 };
 
 const ACCEPTED_ARGS = ['api-key', 'username', 'password'];
-const ACCEPTED_TOOLS = ['transactions.get'];
+const ACCEPTED_TOOLS = ['all', ...TOOL_DEFINITIONS.map((t) => t.name)];
 
 export function parseArgs(args: string[]): Options {
     const options: Options = {};
@@ -72,9 +73,10 @@ export function parseArgs(args: string[]): Options {
     return options;
 }
 
-function handleError(error: any) {
+function handleError(error: unknown) {
     console.error(red('\n🚨  Error initializing HiPay MCP server:\n'));
-    console.error(yellow(`   ${error.message}\n`));
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(yellow(`   ${errorMessage}\n`));
 }
 
 export async function main() {
@@ -83,7 +85,8 @@ export async function main() {
     const server = new HiPayMCPServer({
         username: options.username!,
         password: options.password!,
-        environment: options.environment!
+        environment: options.environment!,
+        enabledTools: options.tools || []
     });
 
     const transport = new StdioServerTransport();
